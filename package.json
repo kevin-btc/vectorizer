@@ -1,0 +1,38 @@
+{
+    "name": "polyfact-tool-template",
+    "version": "0.1.0",
+    "author": "Lancelot Owczarczak <lancelot@owczarczak.fr>",
+    "license": "MIT",
+    "bin": "build/tool",
+    "dependencies": {
+        "fp-ts": "^2.16.0",
+        "io-ts": "^2.2.20",
+        "polyfact": "^0.1",
+        "ts-node": "^10.9.1"
+    },
+    "devDependencies": {
+        "@types/cli-progress": "^3.11.0",
+        "@types/node": "^20.4.2",
+        "@types/node-fetch": "^2.6.4",
+        "@typescript-eslint/eslint-plugin": "^4.14.1",
+        "@typescript-eslint/parser": "^4.14.1",
+        "cli-progress": "^3.12.0",
+        "commander": "^11.0.0",
+        "esbuild": "0.15.10",
+        "eslint": "^7.21.0",
+        "eslint-config-airbnb": "^18.2.1",
+        "eslint-config-airbnb-base": "^14.2.1",
+        "eslint-config-airbnb-typescript": "^12.0.0",
+        "eslint-config-prettier": "^8.1.0",
+        "eslint-plugin-import": "^2.22.1",
+        "eslint-plugin-tsdoc": "^0.2.14",
+        "prettier": "^2.2.1",
+        "typescript": "^4.6.2"
+    },
+    "scripts": {
+        "start": "ts-node src/index.ts",
+        "lint": "prettier --check lib/ src/ ; eslint src/",
+        "lint:fix": "prettier --write src/ ; eslint --fix src/",
+        "build": "esbuild src/index.ts --bundle --outfile=build/tool.tmp --platform=node && echo -n '#!/usr/bin/env node\n' | cat - build/tool.tmp > build/tool && rm build/tool.tmp"
+    }
+}
