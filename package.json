@@ -1,6 +1,6 @@
 {
   "name": "code-vectorizer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "kgricour <kevin@polyfact.com>",
   "license": "MIT",
   "bin": "build/tool",
@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "ai-logger": "^0.0.5",
+    "code-vectorizer": "^0.1.0",
     "fp-ts": "^2.16.0",
     "ignore": "^5.2.4",
     "io-ts": "^2.2.20",

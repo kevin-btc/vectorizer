@@ -1,9 +1,6 @@
 import { createMemory, updateMemory, splitString } from "polyfact";
 import ProgressBar from "progress";
-import { extendConsole } from "ai-logger";
 import readline from "readline";
-
-extendConsole();
 
 const progressBarFormat = "  processing [:bar] :percent :etas";
 const progressBarConfig = {
@@ -13,7 +10,6 @@ const progressBarConfig = {
 };
 
 import fs from "fs";
-import path from "path";
 
 const presentation = `
 ==================================================
@@ -128,8 +124,6 @@ function batchify(array: string[], size: number) {
     batched.push(copied.splice(0, size));
   }
 
-  console.log(`Batchify ${array.length} files into ${batched.length} batches`);
-  console.log(`Batch: ${batched}`);
   return batched;
 }
 

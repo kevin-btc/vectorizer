@@ -505,6 +505,21 @@ cli-progress@^3.12.0:
   dependencies:
     string-width "^4.2.3"
 
+code-vectorizer@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/code-vectorizer/-/code-vectorizer-0.1.0.tgz#515989ea55bae79a864a218e3397746797384b54"
+  integrity sha512-qd7MPp3E9vEr2RsddvAmhy9ZYtxbjvZFzHzFzqTxMHeqdxlHT2TnV5Uq28tO/UIm3G0FOtoT191Qy4VLLe/bQA==
+  dependencies:
+    ai-logger "^0.0.5"
+    fp-ts "^2.16.0"
+    ignore "^5.2.4"
+    io-ts "^2.2.20"
+    lodash "^4.17.21"
+    polyfact "^0.1.16"
+    progress "^2.0.3"
+    readline "^1.3.0"
+    ts-node "^10.9.1"
+
 color-convert@^1.9.0:
   version "1.9.3"
   resolved "https://registry.npmjs.org/color-convert/-/color-convert-1.9.3.tgz"
