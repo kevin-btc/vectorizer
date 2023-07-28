@@ -24,9 +24,9 @@ npm install code-vectorizer
 You can use the vectorizer function directly in your code:
 
 ```javascript
-import { vectorizer } from "../src/index";
+import { vectorizer } from "../lib/index";
 
-const filePaths = ["src/index.ts", "package.json"];
+const filePaths = ["lib/index.ts", "package.json"];
 vectorizer(filePaths, 512);
 ```
 

@@ -1,25 +1,24 @@
 {
   "name": "code-vectorizer",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "author": "kgricour <kevin@polyfact.com>",
   "license": "MIT",
   "bin": "build/tool",
-  "main": "./build/index.js",
-  "types": "./build/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/kevin-btc/code-vectorizer.git"
   },
   "dependencies": {
-    "ai-logger": "^0.0.5",
-    "code-vectorizer": "^0.1.0",
     "fp-ts": "^2.16.0",
     "ignore": "^5.2.4",
     "io-ts": "^2.2.20",
     "lodash": "^4.17.21",
-    "polyfact": "^0.1.16",
+    "polyfact": "polyfact/polyfact-node#d7e58e3",
     "progress": "^2.0.3",
     "readline": "^1.3.0",
+    "shelljs": "^0.8.5",
     "ts-node": "^10.9.1"
   },
   "devDependencies": {
@@ -28,6 +27,7 @@
     "@types/node": "^20.4.2",
     "@types/node-fetch": "^2.6.4",
     "@types/progress": "^2.0.5",
+    "@types/shelljs": "^0.8.12",
     "@typescript-eslint/eslint-plugin": "^4.14.1",
     "@typescript-eslint/parser": "^4.14.1",
     "cli-progress": "^3.12.0",
@@ -44,7 +44,8 @@
     "typescript": "^4.6.2"
   },
   "files": [
-    "build"
+    "build",
+    "dist"
   ],
   "keywords": [
     "vectorizer",
@@ -92,9 +93,10 @@
     "memory-creation"
   ],
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "lint": "prettier --check lib/ src/ ; eslint src/",
-    "lint:fix": "prettier --write src/ ; eslint --fix src/",
-    "build": "tsc -p ./"
+    "start": "ts-node lib/index.ts",
+    "lint": "prettier --check lib/ lib/ ; eslint lib/",
+    "lint:fix": "prettier --write lib/ ; eslint --fix lib/",
+    "build": "tsc -p tsconfig.json --declaration --outDir dist",
+    "cmd:build": "esbuild cmd/index.ts --bundle --outfile=build/vectorizer.tmp --platform=node && echo '#!/usr/bin/env node\n' | cat - build/vectorizer.tmp > build/vectorizer && rm build/vectorizer.tmp"
   }
 }

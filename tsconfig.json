@@ -2,8 +2,8 @@
   "compilerOptions": {
     "target": "es2017",
     "module": "commonjs",
-    "outDir": "build",
-    "rootDir": "src",
+    "outDir": "dist",
+    "rootDir": "lib",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -12,8 +12,8 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "declaration": true,
-    "typeRoots": ["node_modules/@types", "src"]
+    "typeRoots": ["node_modules/@types", "lib"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["lib/**/*.ts"],
   "exclude": ["node_modules", ".git"]
 }
