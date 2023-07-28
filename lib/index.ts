@@ -157,6 +157,13 @@ class Vectorizer {
 
     return result;
   }
+
+  public getMemory(): string {
+    if (this.memoryId === null) {
+      throw new Error("Memory ID is not set.");
+    }
+    return this.memoryId;
+  }
 }
 
 export default Vectorizer;
