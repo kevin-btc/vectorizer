@@ -67,13 +67,15 @@ function splitFiles(
 
 class Vectorizer {
   private memoryId: string | null;
+  private apiKey: string;
   private readonly maxToken: number;
 
-  constructor(maxToken: number, memoryId?: string) {
+  constructor(api_key: string, maxToken: number, memoryId?: string) {
     if (maxToken <= 0) {
       throw new Error("maxToken must be a positive number");
     }
 
+    this.apiKey = api_key;
     this.memoryId = memoryId || null;
     this.maxToken = maxToken;
   }
@@ -144,7 +146,8 @@ class Vectorizer {
           const updated = await updateMemory(
             this.memoryId,
             JSON.stringify(file),
-            this.maxToken
+            this.maxToken,
+            { token: this.apiKey }
           );
 
           file = { ...file, saved: Boolean(updated) };

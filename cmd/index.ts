@@ -2,7 +2,6 @@ import { Command } from "commander";
 import ProgressBar from "progress";
 import { version } from "../package.json";
 import Vectorizer, { TFile } from "../lib";
-import shelljs from "shelljs";
 
 const progressBarFormat = "  processing [:bar] :percent :etas";
 const progressBarConfig = {
@@ -30,16 +29,7 @@ program
     ""
   )
   .action(async (files: string[], { maxToken, token }) => {
-    if (!process?.env?.POLYFACT_TOKEN && !token) {
-      console.error(
-        "Please provide a polyfact token using the -k option. You can generate one here: https://app.polyfact.com/"
-      );
-      return;
-    }
-
-    shelljs.env["POLYFACT_TOKEN"] = token;
-
-    const vectorizer = new Vectorizer(parseInt(maxToken));
+    const vectorizer = new Vectorizer(token, parseInt(maxToken));
 
     const splitProgress = new ProgressBar(progressBarFormat, {
       ...progressBarConfig,
