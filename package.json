@@ -1,9 +1,9 @@
 {
   "name": "code-vectorizer",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "author": "kgricour <kevin@polyfact.com>",
   "license": "MIT",
-  "bin": "build/tool",
+  "bin": "build/vectorizer",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "repository": {

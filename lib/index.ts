@@ -158,7 +158,7 @@ class Vectorizer {
     return result;
   }
 
-  public getMemory(): string {
+  public getMemoryId(): string {
     if (this.memoryId === null) {
       throw new Error("Memory ID is not set.");
     }
