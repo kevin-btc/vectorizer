@@ -1,13 +1,22 @@
 import { createMemory, updateMemory, splitString } from "polyfact";
 import _ from "lodash";
+import { PDFLoader } from "langchain/document_loaders/fs/pdf";
+
 import * as path from "path";
 import fs from "fs";
 
 export type TFile = {
   path: string;
   content: string;
+  page?: number;
+  filename?: string;
   saved?: boolean;
 };
+
+export enum SourceType {
+  DIRECTORY,
+  PDF,
+}
 
 function readDirRecursive(dir: string): TFile[] {
   const result: TFile[] = [];
@@ -69,8 +78,14 @@ class Vectorizer {
   private memoryId: string | null;
   private apiKey: string;
   private readonly maxToken: number;
+  private sourceType: SourceType;
 
-  constructor(api_key: string, maxToken: number, memoryId?: string) {
+  constructor(
+    api_key: string,
+    maxToken: number,
+    sourceType: SourceType,
+    memoryId?: string
+  ) {
     if (maxToken <= 0) {
       throw new Error("maxToken must be a positive number");
     }
@@ -78,6 +93,7 @@ class Vectorizer {
     this.apiKey = api_key;
     this.memoryId = memoryId || null;
     this.maxToken = maxToken;
+    this.sourceType = sourceType;
   }
 
   private async ensureMemoryInitialized(): Promise<void> {
@@ -86,7 +102,49 @@ class Vectorizer {
     }
   }
 
-  public readFilesFromPath(files: string[]): TFile[] {
+  private async readPDFs(files: string[]): Promise<TFile[]> {
+    const output: TFile[] = [];
+
+    async function extractPDFContent(
+      filePath: string,
+      perPage: boolean = true
+    ) {
+      const loaderOptions = perPage ? {} : { splitPages: false };
+      const loader = new PDFLoader(filePath, loaderOptions);
+
+      try {
+        const docs = await loader.load();
+        const filename = path.basename(filePath);
+
+        if (perPage) {
+          for (let i = 0; i < docs.length; i++) {
+            output.push({
+              content: docs[i].pageContent, // Assuming each doc has a text attribute
+              page: i + 1,
+              filename: filename,
+              path: filePath,
+            });
+          }
+        } else {
+          output.push({
+            content: docs[0].pageContent, // Assuming the complete document's content is in the first doc
+            page: 1,
+            filename: filename,
+            path: filePath,
+          });
+        }
+      } catch (error: any) {
+        throw new Error(`Error reading "${filePath}": ${error.message}`);
+      }
+    }
+
+    const promises = files.map((file) => extractPDFContent(path.resolve(file)));
+    await Promise.all(promises);
+
+    return output;
+  }
+
+  private readFilesFromRepo(files: string[]): TFile[] {
     if (!Array.isArray(files)) {
       throw new Error(`Expected an array, but received ${typeof files}`);
     }
@@ -106,6 +164,16 @@ class Vectorizer {
         }
       })
     );
+  }
+
+  public async readFiles(files: string[]): Promise<TFile[]> {
+    if (this.sourceType === SourceType.DIRECTORY) {
+      return this.readFilesFromRepo(files);
+    } else if (this.sourceType === SourceType.PDF) {
+      return this.readPDFs(files);
+    } else {
+      throw new Error("Unknown source type");
+    }
   }
 
   public async vectorize(
