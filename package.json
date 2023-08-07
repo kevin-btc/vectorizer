@@ -1,6 +1,6 @@
 {
   "name": "@polyfact/vectorizer",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "author": "kgricour <kevin@polyfact.com>",
   "license": "MIT",
   "bin": "build/vectorizer",
