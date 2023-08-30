@@ -1,6 +1,6 @@
 {
   "name": "@polyfact/vectorizer",
-  "version": "1.0.1",
+  "version": "1.0.5",
   "author": "kgricour <kevin@polyfact.com>",
   "license": "MIT",
   "bin": "build/vectorizer",
@@ -11,6 +11,7 @@
     "url": "https://github.com/kevin-btc/code-vectorizer.git"
   },
   "dependencies": {
+    "@dqbd/tiktoken": "^1.0.7",
     "fp-ts": "^2.16.0",
     "ignore": "^5.2.4",
     "io-ts": "^2.2.20",
