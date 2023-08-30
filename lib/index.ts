@@ -1,4 +1,5 @@
-import { createMemory, updateMemory, splitString } from "polyfact";
+import { createMemory, transcribe, updateMemory } from "polyfact";
+import { splitString } from "./splitString";
 import _ from "lodash";
 import { PDFLoader } from "langchain/document_loaders/fs/pdf";
 
@@ -16,7 +17,13 @@ export type TFile = {
 export enum SourceType {
   DIRECTORY,
   PDF,
+  AUDIO,
 }
+
+type ClientOptions = {
+  token: string;
+  endpoint?: string;
+};
 
 function readDirRecursive(dir: string): TFile[] {
   const result: TFile[] = [];
@@ -76,30 +83,68 @@ function splitFiles(
 
 class Vectorizer {
   private memoryId: string | null;
-  private apiKey: string;
+  private clientOptions: ClientOptions;
   private readonly maxToken: number;
-  private sourceType: SourceType;
 
   constructor(
-    api_key: string,
+    clientOptions: ClientOptions,
     maxToken: number,
-    sourceType: SourceType,
     memoryId?: string
   ) {
     if (maxToken <= 0) {
       throw new Error("maxToken must be a positive number");
     }
 
-    this.apiKey = api_key;
+    this.clientOptions = clientOptions;
     this.memoryId = memoryId || null;
     this.maxToken = maxToken;
-    this.sourceType = sourceType;
   }
 
   private async ensureMemoryInitialized(): Promise<void> {
+    console.log("ensureMemoryInitialized", this.memoryId, !this.memoryId);
     if (!this.memoryId) {
-      this.memoryId = (await createMemory()).id;
+      console.info("Creating memory ...");
+
+      const test = await createMemory(this.clientOptions);
+
+      console.log(test);
+      this.memoryId = test.id;
+      console.info(`Memory created with id: ${this.memoryId}`);
     }
+  }
+
+  private async readAudios(filePaths: string[]): Promise<TFile[]> {
+    if (!this.clientOptions?.token) {
+      throw new Error("No token provided.");
+    }
+    const files: TFile[] = [];
+
+    for (const filePath of filePaths) {
+      if (filePath && fs.existsSync(filePath)) {
+        try {
+          const audio = fs.readFileSync(filePath);
+
+          console.info(`Transcribing ...`);
+
+          const transcription = await transcribe(audio, this.clientOptions);
+
+          console.info(`Transcription done.`);
+
+          files.push({
+            path: filePath,
+            content: transcription,
+            filename: filePath.split("/").pop() ?? "",
+          });
+          console.info(`Added file: ${filePath}`);
+        } catch (error: any) {
+          console.error(`Error reading "${filePath}": ${error.message}`);
+        }
+      } else {
+        console.error("Invalid filePath : no file path provided.");
+      }
+    }
+
+    return files;
   }
 
   private async readPDFs(files: string[]): Promise<TFile[]> {
@@ -119,7 +164,7 @@ class Vectorizer {
         if (perPage) {
           for (let i = 0; i < docs.length; i++) {
             output.push({
-              content: docs[i].pageContent, // Assuming each doc has a text attribute
+              content: docs[i].pageContent,
               page: i + 1,
               filename: filename,
               path: filePath,
@@ -127,7 +172,7 @@ class Vectorizer {
           }
         } else {
           output.push({
-            content: docs[0].pageContent, // Assuming the complete document's content is in the first doc
+            content: docs[0].pageContent,
             page: 1,
             filename: filename,
             path: filePath,
@@ -166,11 +211,16 @@ class Vectorizer {
     );
   }
 
-  public async readFiles(files: string[]): Promise<TFile[]> {
-    if (this.sourceType === SourceType.DIRECTORY) {
+  public async readFiles(
+    files: string[],
+    sourceType: SourceType = SourceType.DIRECTORY
+  ): Promise<TFile[]> {
+    if (sourceType === SourceType.DIRECTORY) {
       return this.readFilesFromRepo(files);
-    } else if (this.sourceType === SourceType.PDF) {
+    } else if (sourceType === SourceType.PDF) {
       return this.readPDFs(files);
+    } else if (sourceType == SourceType.AUDIO) {
+      return this.readAudios(files);
     } else {
       throw new Error("Unknown source type");
     }
@@ -215,7 +265,7 @@ class Vectorizer {
             this.memoryId,
             JSON.stringify(file),
             this.maxToken,
-            { token: this.apiKey }
+            this.clientOptions
           );
 
           file = { ...file, saved: Boolean(updated) };
@@ -230,6 +280,7 @@ class Vectorizer {
   }
 
   public getMemoryId(): string {
+    console.log("getMemoryId", this.memoryId);
     if (this.memoryId === null) {
       throw new Error("Memory ID is not set.");
     }
